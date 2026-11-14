@@ -14,7 +14,7 @@ jobs:
   luau:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install Rokit and pinned tools
         env:
           # authenticated API calls: the anonymous limit (shared runner IPs) returned 403
