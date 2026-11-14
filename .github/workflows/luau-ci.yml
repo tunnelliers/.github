@@ -16,9 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rokit and pinned tools
+        env:
+          # authenticated API calls: the anonymous limit (shared runner IPs) returned 403
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
           echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+          "$HOME/.rokit/bin/rokit" authenticate github --token "$GITHUB_TOKEN"
           "$HOME/.rokit/bin/rokit" install --no-trust-check
       - name: Rojo build
         run: |
