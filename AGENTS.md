@@ -44,10 +44,13 @@ Local clones: `D:\a\projects\tunnelliers\<repo>` (art: `CE_ART_DIR`). Every repo
 
 ### Golden rules (breaking one can destroy the other person's work)
 1. **Game scripts are edited in the repo files, never in Studio.** Rojo overwrites Studio edits.
-2. **`git pull` before connecting Rojo; the Rojo change list must be EMPTY (or exactly what you expect).** With Team
-   Create, older local files overwrite the other person's newer scripts. Unsure → Abort, run the drift check (`ROJO.md`).
-3. **Never switch branches (`switch`, `checkout`, `stash`) while `rojo serve` runs** on that checkout (stop it, or
-   `git worktree add`).
+2. **The shared Team Create place gets `main` only, from ONE sync host**: `python -I tools/rojo_host.py <game>` (repo
+   `games`, run it in the background when your human opens Studio), then Rojo > Connect, port 34873. It serves its own
+   worktree `games-host` and pulls `main` every minute, so merged PRs of BOTH people reach Studio by themselves. Rojo
+   allows one syncer per place: "someone else is syncing" = the other person hosts already, do nothing. Never connect
+   Rojo from a normal checkout to the shared place. First change list must be EMPTY; unsure → Abort, drift check.
+3. **Unmerged work is tested in a LOCAL copy of the place** (Studio File > Save to File, own `rojo serve --port 34872`),
+   never in the shared place. Never edit or switch anything inside `games-host`.
 4. **One branch + one PR per change, CI green, squash merge.** Never push to `main` (GitHub Free can't block it: it is
    on you). Only exceptions: `vault` notes (Obsidian pushes them) and small doc fixes in the art repo. Stage files by
    name, never blind `git add -A`.
