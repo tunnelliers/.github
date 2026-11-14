@@ -1,5 +1,5 @@
 # Workflow reutilisable : Rojo build + typecheck luau-lsp pour un depot de jeux Roblox.
-# Appel : jobs: ci: uses: tunnelliers-studio/.github/.github/workflows/luau-ci.yml@main
+# Appel : jobs: ci: uses: tunnelliers/.github/.github/workflows/luau-ci.yml@main
 name: Luau CI (reusable)
 
 on:
