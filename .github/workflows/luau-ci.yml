@@ -23,6 +23,7 @@ jobs:
         run: |
           curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
           echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+          "$HOME/.rokit/bin/rokit" authenticate github --token "$GITHUB_TOKEN"
           "$HOME/.rokit/bin/rokit" install --no-trust-check
       - name: Rojo build
         run: |
