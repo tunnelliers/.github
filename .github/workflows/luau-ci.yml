@@ -1,0 +1,28 @@
+# Workflow reutilisable : Rojo build + typecheck luau-lsp pour un depot de jeux Roblox.
+# Appel : jobs: ci: uses: tunnelliers-studio/.github/.github/workflows/luau-ci.yml@main
+name: Luau CI (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      projects-glob:
+        description: Glob of Rojo project folders to build
+        type: string
+        default: "games/*"
+
+jobs:
+  luau:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rokit and pinned tools
+        run: |
+          curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
+          echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+          "$HOME/.rokit/bin/rokit" install --no-trust-check
+      - name: Rojo build
+        run: |
+          for g in ${{ inputs.projects-glob }}; do
+            [ -f "$g/default.project.json" ] || continue
+            rojo build "$g" -o "/tmp/$(basename "$g").rbxl"
+          done
