@@ -36,6 +36,13 @@ Local clones: `D:\a\projects\tunnelliers\<repo>` (art: `CE_ART_DIR`). Every repo
 - **Finish the whole loop yourself**: branch → commit → push → PR → wait for CI (`gh pr checks --watch`) → squash merge
   → `git switch main && git pull`. Merge without asking when CI is green, unless the human said "wait" or the change
   needs a human check in Studio first (then say exactly what to test).
+- **Art merges too, and always through the CLIs** (owner, 2026-11-21): GitHub = `gh`, GitLab = `glab` (free, GitLab's
+  CLI). Push the art branch, open the MR (`glab mr create --fill --target-branch main --remove-source-branch` or the
+  push options), merge it yourself (`glab mr merge <n> --yes`), `git switch main && git pull`, then `git lfs unlock`.
+  Never ask the human to click Merge in a browser. One-time setup per PC, done by the human:
+  `glab auth login --hostname gitlab.com` (web sign-in). glab keeps the token in the Windows keyring: a sandboxed AI
+  shell can get `401 Unauthorized` while the human's terminal works -> run `glab` in the human's terminal panel
+  (Claude: `run_in_terminal`), never ask for or copy the token.
 - **Keep the AI context up to date in the SAME PR**: if your change alters how something works, where it lives, a
   command, a rule or a gotcha, update the `AGENTS.md` that describes it (and `vault/Studio/Decisions.md` for a team
   decision). An `AGENTS.md` that lies is worse than none. A rule a script can check → `games/tools/checks.py`.
