@@ -13,14 +13,14 @@ Source: `tunnelliers/studio` → `plugins/tunnelliers/team-rules.md`. Copied int
 
 ### Who you work for
 Two "vibe coders", not developers: the studio owner (GitHub `bayromest`) and Théo (GitHub `LaTheorieBrutale`,
-Roblox BrutalTheoryFR). They say WHAT they want; you do ALL the technical work (git, PRs, tests, CI, Rojo, Studio,
+Roblox BrutalTheoryFR). They say WHAT they want; you do ALL the technical work (git, PRs, tests, CI, Studio,
 Blender) yourself, without asking them to type commands, and report in simple French with no unexplained jargon.
 Both work with AI on the same games at the same time: these rules are the shared contract between their AIs.
 
 ### Where things live (never mix them)
 | What | Where |
 |---|---|
-| Game scripts (source of truth) | GitHub `tunnelliers/games` → `games/<game>/src/`, pushed into Studio by Rojo |
+| Game scripts (source of truth) | GitHub `tunnelliers/games` → `games/<game>/src/`, pushed into Studio by `tools/studio_sync.py` (no Rojo sync) |
 | Map, GUIs, models, values, sounds | the Roblox place itself (Team Create) |
 | Blender art | GitLab `tunnelliers/<game>-art` (Git LFS + locks), never on GitHub |
 | AI rules, skills, onboarding, setup check | GitHub `tunnelliers/studio` |
@@ -46,18 +46,20 @@ Local clones: `D:\a\projects\tunnelliers\<repo>` (art: `CE_ART_DIR`). Every repo
 - **Keep the AI context up to date in the SAME PR**: if your change alters how something works, where it lives, a
   command, a rule or a gotcha, update the `AGENTS.md` that describes it (and `vault/Studio/Decisions.md` for a team
   decision). An `AGENTS.md` that lies is worse than none. A rule a script can check → `games/tools/checks.py`.
-- **End**: PR merged (or open with the reason), locks released, Rojo not left broken, and a 3-line French summary:
+- **End**: PR merged (or open with the reason), locks released, Studio in sync with `main` (studio_sync dry run says identical), and a 3-line French summary:
   what changed, what the human must do (test? publish?), what is not done.
 
 ### Golden rules (breaking one can destroy the other person's work)
-1. **Game scripts are edited in the repo files, never in Studio.** Rojo overwrites Studio edits.
-2. **The shared Team Create place gets `main` only, from ONE sync host**: `python -I tools/rojo_host.py <game>` (repo
-   `games`, run it in the background when your human opens Studio), then Rojo > Connect, port 34873. It serves its own
-   worktree `games-host` and pulls `main` every minute, so merged PRs of BOTH people reach Studio by themselves. Rojo
-   allows one syncer per place: "someone else is syncing" = the other person hosts already, do nothing. Never connect
-   Rojo from a normal checkout to the shared place. First change list must be EMPTY; unsure → Abort, drift check.
-3. **Unmerged work is tested in a LOCAL copy of the place** (Studio File > Save to File, own `rojo serve --port 34872`),
-   never in the shared place. Never edit or switch anything inside `games-host`.
+1. **Game scripts are edited in the repo files, never in Studio.** The next sync overwrites Studio edits (or flags them as DRIFT).
+2. **The shared Team Create place gets `main` only, pushed by the AI with `python -I tools/studio_sync.py`** (repo
+   `games`, background) **+ the Studio MCP** (the launcher snippet is in that file's docstring): after every merged PR
+   and whenever a human opens Studio, run it with `dryRun = true` first, read the list, then apply. Studio must be in
+   Edit mode. It writes only script sources (and the properties pinned in `default.project.json`), never GUIs / models /
+   values; a script edited in Studio is reported as DRIFT and NOT overwritten. Rojo no longer syncs anything (owner,
+   2026-11-26): it only builds the project for CI (tests, typecheck). Details: `games/<game>/ROJO.md`.
+3. **Unmerged work is tested in a LOCAL copy of the place** (Studio File > Save to File, open the copy, then
+   `python -I tools/studio_sync.py --ref <branch>` or `--worktree` + the launcher with `force = true`), never in the
+   shared place.
 4. **One branch + one PR per change, CI green, squash merge.** Never push to `main` (GitHub Free can't block it: it is
    on you). Only exceptions: `vault` notes (Obsidian pushes them) and small doc fixes in the art repo. Stage files by
    name, never blind `git add -A`.
